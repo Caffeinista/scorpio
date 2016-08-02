@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
-//            startActivity(new Intent(this, SignInActivity.class));
+            startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
         } else {
