@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "583163839970",
+    "firebase_url": "https://caffeinista-scorpio.firebaseio.com",
+    "project_id": "caffeinista-scorpio",
+    "storage_bucket": "caffeinista-scorpio.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583163839970:android:183b5cbd01c496e3",
+        "android_client_info": {
+          "package_name": "com.ithomaslin.caffeinista"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "583163839970-q45h19vtbn5d3r924buq4ovaj3r23a48.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyiBqGc_JHOsLtKUZ1yQ8SXNSWDjMKfBA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
