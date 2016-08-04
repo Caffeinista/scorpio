@@ -5,18 +5,18 @@
 
     <ImageView
         android:id="@+id/background"
-        android:src="@drawable/office_2"
+        android:src="@drawable/office"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"/>
 
     <ImageView
-        android:layout_marginTop="235dp"
-        android:layout_marginLeft="160dp"
+        android:layout_marginTop="251dp"
+        android:layout_marginLeft="155dp"
         android:id="@+id/coffee"
-        android:src="@drawable/coffee_1"
-        android:layout_height="30dp"
+        android:src="@drawable/coffee"
+        android:layout_height="50dp"
         android:layout_width="wrap_content"/>
 
 </RelativeLayout>

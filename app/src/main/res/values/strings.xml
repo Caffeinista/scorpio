@@ -6,7 +6,8 @@
 
     <string name="title_activity_sign_in">SignInActivity</string>
 
-    <string name="welcome_title_page">Welcome to Caffeinista</string>
+    <string name="welcome_title_page">Welcome to Caffeinista!</string>
+    <string name="welcome_title_description">Join today to start enjoy wonderful coffee.</string>
     <string name="welcome_one_title">Order your coffee anytime</string>
     <string name="welcome_one_description">With this app, your coffee is just a few clicks away.</string>
     <string name="welcome_two_title">Quality makes everything</string>

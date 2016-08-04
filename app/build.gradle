@@ -43,9 +43,8 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
 
     // WelcomeScreen
-    compile 'com.stephentuso:welcome:0.7.2'
+//    compile 'com.stephentuso:welcome:0.7.2'
+    compile project(path: ":library")
 }
-
-
 
 apply plugin: 'com.google.gms.google-services'
