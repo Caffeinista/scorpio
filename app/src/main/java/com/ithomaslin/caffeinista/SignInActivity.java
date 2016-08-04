@@ -11,19 +11,29 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 
+import com.stephentuso.welcome.WelcomeScreenHelper;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class SignInActivity extends AppCompatActivity {
 
+    WelcomeScreenHelper welcomeScreen;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Window window = getWindow();
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.primary_dark));
-
         setContentView(R.layout.activity_sign_in);
+
+        welcomeScreen = new WelcomeScreenHelper(this, CustomWelcomeActivity.class);
+        welcomeScreen.show(savedInstanceState);
+
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        welcomeScreen.onSaveInstanceState(outState);
+    }
 }
