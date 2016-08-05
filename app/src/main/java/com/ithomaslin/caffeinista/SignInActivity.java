@@ -1,15 +1,9 @@
 package com.ithomaslin.caffeinista;
 
-import android.annotation.SuppressLint;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
+import android.widget.Button;
 
 import com.stephentuso.welcome.WelcomeScreenHelper;
 
@@ -28,6 +22,16 @@ public class SignInActivity extends AppCompatActivity {
 
         welcomeScreen = new WelcomeScreenHelper(this, CustomWelcomeActivity.class);
         welcomeScreen.show(savedInstanceState);
+
+        Button restartWelcomeBtn = (Button) findViewById(R.id.restartWelcomeBtn);
+        restartWelcomeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                welcomeScreen.forceShow();
+                overridePendingTransition(R.anim.left_slide_in, R.anim.left_slide_out);
+            }
+        });
+
 
     }
 

@@ -23,7 +23,7 @@ public class CustomWelcomeActivity extends WelcomeActivity {
                         getString(R.string.welcome_three_description), R.color.primary, 0.2f, 2f)
                 .useCustomDoneButton(true)
                 .backButtonSkips(false)
-                .swipeToDismiss(false)
+                .swipeToDismiss(true)
                 .build();
     }
 }

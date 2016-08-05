@@ -4,8 +4,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_settings">Settings</string>
 
-    <string name="title_activity_sign_in">SignInActivity</string>
-
     <string name="welcome_title_page">Welcome to Caffeinista!</string>
     <string name="welcome_title_description">Join today to start enjoy wonderful coffee.</string>
     <string name="welcome_one_title">Order your coffee anytime</string>
@@ -14,6 +12,10 @@
     <string name="welcome_two_description">We always guarantee to offer you the best quality, for every single cup of coffee we brew.</string>
     <string name="welcome_three_title">Made with love</string>
     <string name="welcome_three_description">Our barista are the kindest, most talented experts with great passion towards coffee.</string>
+
+    <string name="title_activity_sign_in">SignInActivity</string>
+    <string name="restart_welcome">Take tour again</string>
+    <string name="sign_in_btn">Sign in with Google</string>
 
 
 </resources>
