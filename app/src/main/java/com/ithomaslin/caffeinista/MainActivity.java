@@ -64,9 +64,9 @@ public class MainActivity extends AppCompatActivity implements
     private AccountHeader mDrawerHeader = null;
     private Drawer mDrawer = null;
     private IProfile mProfile;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     private String mUsername;
-    private String mPhotoUrl;
     private Uri mPhotoUri;
     private String mUserEmail;
     private SharedPreferences mSharedPreferences;
@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements
             mUsername = mFirebaseUser.getDisplayName();
             mUserEmail = mFirebaseUser.getEmail();
             if (mFirebaseUser.getPhotoUrl() != null) {
-                mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
                 mPhotoUri = mFirebaseUser.getPhotoUrl();
             }
 
@@ -125,9 +124,13 @@ public class MainActivity extends AppCompatActivity implements
                     if (DrawerImageLoader.Tags.PROFILE.name().equals(tag)) {
                         return DrawerUIUtils.getPlaceHolder(ctx);
                     } else if (DrawerImageLoader.Tags.ACCOUNT_HEADER.name().equals(tag)) {
-                        return new IconicsDrawable(ctx).iconText(" ").backgroundColorRes(com.mikepenz.materialdrawer.R.color.primary).sizeDp(56);
+                        return new IconicsDrawable(ctx).iconText(" ")
+                                .backgroundColorRes(com.mikepenz.materialdrawer.R.color.primary)
+                                .sizeDp(56);
                     } else if ("customUrlItem".equals(tag)) {
-                        return new IconicsDrawable(ctx).iconText(" ").backgroundColorRes(R.color.md_red_500).sizeDp(56);
+                        return new IconicsDrawable(ctx).iconText(" ")
+                                .backgroundColorRes(R.color.md_red_500)
+                                .sizeDp(56);
                     }
                     return super.placeholder(ctx, tag);
                 }
@@ -142,10 +145,10 @@ public class MainActivity extends AppCompatActivity implements
                     .withActionBarDrawerToggle(true)
                     .withAccountHeader(mDrawerHeader)
                     .addDrawerItems(
-                            new PrimaryDrawerItem().withName("Home")
+                            new PrimaryDrawerItem().withName(R.string.home)
                                     .withIcon(FontAwesome.Icon.faw_home)
                                     .withIdentifier(HOME_IDENTIFIER),
-                            new PrimaryDrawerItem().withName("History")
+                            new PrimaryDrawerItem().withName(R.string.order_history)
                                     .withIcon(FontAwesome.Icon.faw_history)
                                     .withIdentifier(HISTORY_IDENTIFIER)
                     )
@@ -155,11 +158,27 @@ public class MainActivity extends AppCompatActivity implements
                             return false;
                         }
                     })
+                    .withOnDrawerListener(new Drawer.OnDrawerListener() {
+                        @Override
+                        public void onDrawerOpened(View drawerView) {
+
+                        }
+
+                        @Override
+                        public void onDrawerClosed(View drawerView) {
+
+                        }
+
+                        @Override
+                        public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                        }
+                    })
                     .addStickyDrawerItems(
-                            new SecondaryDrawerItem().withName("Settings")
+                            new SecondaryDrawerItem().withName(R.string.settings)
                                     .withIcon(FontAwesome.Icon.faw_cog)
                                     .withIdentifier(SETTINGS_IDENTIFIER),
-                            new SecondaryDrawerItem().withName("Log Out")
+                            new SecondaryDrawerItem().withName(R.string.logout)
                                     .withIcon(FontAwesome.Icon.faw_sign_out)
                                     .withIdentifier(LOGOUT_IDENTIFIER)
                     )
@@ -173,10 +192,10 @@ public class MainActivity extends AppCompatActivity implements
                                         Toast.makeText(MainActivity.this, mUsername, Toast.LENGTH_LONG).show();
                                         return false;
                                     case (int) HISTORY_IDENTIFIER:
-                                        Toast.makeText(MainActivity.this, "History", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MainActivity.this, R.string.order_history, Toast.LENGTH_LONG).show();
                                         return false;
                                     case (int) SETTINGS_IDENTIFIER:
-                                        Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MainActivity.this, R.string.settings, Toast.LENGTH_LONG).show();
                                         return false;
                                     case (int) LOGOUT_IDENTIFIER:
                                         mFirebaseAuth.signOut();
@@ -184,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements
                                         mFirebaseUser = null;
                                         mUsername = ANONYMOUS;
                                         mUserEmail = null;
-                                        mPhotoUrl = null;
                                         startActivity(new Intent(MainActivity.this, SignInActivity.class));
                                         return false;
                                     default:
@@ -293,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements
                 mFirebaseUser = null;
                 mFirebaseUser = null;
                 mUsername = ANONYMOUS;
-                mPhotoUrl = null;
+                mPhotoUri = null;
                 startActivity(new Intent(this, SignInActivity.class));
                 return true;
             default:
