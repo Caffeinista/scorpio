@@ -19,9 +19,8 @@
 
     <style name="CustomWelcomeScreenTheme" parent="WelcomeScreenTheme">
         <item name="android:windowBackground">@color/primary</item>
-        <item name="android:colorBackground">@color/primary</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:navigationBarColor">@color/primary_dark</item>
+        <item name="android:windowTranslucentNavigation">false</item>
 
         <item name="welcomeIndicatorStyle">@style/WelcomeScreenPageIndicator.Custom</item>
         <item name="welcomeTitleTextStyle">@style/WelcomeScreenText.Title.Centered</item>
@@ -37,10 +36,7 @@
 
     <!-- Sign in activity theme. -->
     <style name="SignInTheme" parent="AppTheme">
-        <item name="android:statusBarColor">@color/primary_dark</item>
-        <item name="android:windowBackground">@color/primary</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:navigationBarColor">@color/primary_dark</item>
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

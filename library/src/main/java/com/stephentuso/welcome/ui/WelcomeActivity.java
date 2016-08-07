@@ -149,8 +149,8 @@ public abstract class WelcomeActivity extends AppCompatActivity {
         setWelcomeScreenResult(RESULT_OK);
         super.finish();
 //        if (mConfiguration.getExitAnimation() == WelcomeScreenConfiguration.NO_ANIMATION_SET)
-        if (canScrollToNextPage() || mConfiguration.getExitAnimation() != WelcomeScreenConfiguration.NO_ANIMATION_SET)
-            overridePendingTransition(R.anim.mright_in, R.anim.mleft_out);
+//        if (canScrollToNextPage() || mConfiguration.getExitAnimation() != WelcomeScreenConfiguration.NO_ANIMATION_SET)
+        overridePendingTransition(R.anim.mright_in, R.anim.mleft_out);
     }
 
     /**
