@@ -92,9 +92,9 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        preTask();
 
         if (requestCode == RC_SIGN_IN) {
-            preTask();
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
@@ -172,7 +172,7 @@ public class SignInActivity extends AppCompatActivity implements
 
     private void preTask() {
         inAnimation = new AlphaAnimation(0f, 1f);
-        inAnimation.setDuration(200);
+        inAnimation.setDuration(0);
         mProgressbarHolder.setAnimation(inAnimation);
         mProgressbarHolder.setVisibility(View.VISIBLE);
         mProgressbar.setVisibility(View.VISIBLE);

@@ -29,7 +29,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.squareup.picasso.Picasso;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
@@ -37,13 +39,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
     public static final String ANONYMOUS = "anonymous";
+    private AccountHeader headerResult = null;
+    private Drawer result = null;
 
     private String mUsername;
     private String mPhotoUrl;
+    private String mUserEmail;
     private SharedPreferences mSharedPreferences;
-    private DrawerLayout mDrawer;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private Toolbar mToolbar;
 
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
@@ -61,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -74,28 +75,11 @@ public class MainActivity extends AppCompatActivity implements
             return;
         } else {
             mUsername = mFirebaseUser.getDisplayName();
+            mUserEmail = mFirebaseUser.getEmail();
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
             }
-
-            mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar,
-                    R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-
-                @Override
-                public void onDrawerOpened(View drawerView) {
-                    super.onDrawerOpened(drawerView);
-                }
-
-                @Override
-                public void onDrawerClosed(View drawerView) {
-                    super.onDrawerClosed(drawerView);
-                }
-            };
-
         }
-        mDrawer.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
@@ -113,15 +97,7 @@ public class MainActivity extends AppCompatActivity implements
                         .setAction("Action", null).show();
             }
         });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        
     }
 
     @Override
@@ -163,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (item.getItemId()) {
             case R.id.nav_account:
-                Toast.makeText(this, mPhotoUrl, Toast.LENGTH_LONG).show();
                 closeDrawer();
                 return true;
             case R.id.nav_history:
@@ -187,8 +162,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void closeDrawer() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+
     }
 
     @Override
