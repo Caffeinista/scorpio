@@ -1,7 +1,10 @@
 package com.ithomaslin.caffeinista;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -21,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,9 +33,21 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
+import com.mikepenz.materialdrawer.util.DrawerUIUtils;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
@@ -39,11 +55,19 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
     public static final String ANONYMOUS = "anonymous";
-    private AccountHeader headerResult = null;
-    private Drawer result = null;
+    private static final long PROFILE_IDENTIFIER = 0;
+    private static final long HOME_IDENTIFIER = 2;
+    private static final long HISTORY_IDENTIFIER = 2;
+    private static final long LOGOUT_IDENTIFIER = 9;
+    private static final long SETTINGS_IDENTIFIER = 10;
+
+    private AccountHeader mDrawerHeader = null;
+    private Drawer mDrawer = null;
+    private IProfile mProfile;
 
     private String mUsername;
     private String mPhotoUrl;
+    private Uri mPhotoUri;
     private String mUserEmail;
     private SharedPreferences mSharedPreferences;
 
@@ -54,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    // Google API Client
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -63,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -78,16 +106,104 @@ public class MainActivity extends AppCompatActivity implements
             mUserEmail = mFirebaseUser.getEmail();
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+                mPhotoUri = mFirebaseUser.getPhotoUrl();
             }
+
+            DrawerImageLoader.init(new AbstractDrawerImageLoader() {
+                @Override
+                public void set(ImageView imageView, Uri uri, Drawable placeholder) {
+                    Glide.with(imageView.getContext()).load(uri).placeholder(placeholder).into(imageView);
+                }
+
+                @Override
+                public void cancel(ImageView imageView) {
+                    Glide.clear(imageView);
+                }
+
+                @Override
+                public Drawable placeholder(Context ctx, String tag) {
+                    if (DrawerImageLoader.Tags.PROFILE.name().equals(tag)) {
+                        return DrawerUIUtils.getPlaceHolder(ctx);
+                    } else if (DrawerImageLoader.Tags.ACCOUNT_HEADER.name().equals(tag)) {
+                        return new IconicsDrawable(ctx).iconText(" ").backgroundColorRes(com.mikepenz.materialdrawer.R.color.primary).sizeDp(56);
+                    } else if ("customUrlItem".equals(tag)) {
+                        return new IconicsDrawable(ctx).iconText(" ").backgroundColorRes(R.color.md_red_500).sizeDp(56);
+                    }
+                    return super.placeholder(ctx, tag);
+                }
+            });
+
+            mProfile = new ProfileDrawerItem().withName(mUsername).withEmail(mUserEmail).withIcon(mPhotoUri).withIdentifier(PROFILE_IDENTIFIER);
+            buildHeader(false, savedInstanceState);
+
+            mDrawer = new DrawerBuilder()
+                    .withActivity(this)
+                    .withToolbar(toolbar)
+                    .withActionBarDrawerToggle(true)
+                    .withAccountHeader(mDrawerHeader)
+                    .addDrawerItems(
+                            new PrimaryDrawerItem().withName("Home")
+                                    .withIcon(FontAwesome.Icon.faw_home)
+                                    .withIdentifier(HOME_IDENTIFIER),
+                            new PrimaryDrawerItem().withName("History")
+                                    .withIcon(FontAwesome.Icon.faw_history)
+                                    .withIdentifier(HISTORY_IDENTIFIER)
+                    )
+                    .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
+                        @Override
+                        public boolean onNavigationClickListener(View clickedView) {
+                            return false;
+                        }
+                    })
+                    .addStickyDrawerItems(
+                            new SecondaryDrawerItem().withName("Settings")
+                                    .withIcon(FontAwesome.Icon.faw_cog)
+                                    .withIdentifier(SETTINGS_IDENTIFIER),
+                            new SecondaryDrawerItem().withName("Log Out")
+                                    .withIcon(FontAwesome.Icon.faw_sign_out)
+                                    .withIdentifier(LOGOUT_IDENTIFIER)
+                    )
+                    .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                        @Override
+                        public boolean onItemClick(View view, int position,
+                                                   IDrawerItem drawerItem) {
+                            if (drawerItem != null) {
+                                switch ((int) drawerItem.getIdentifier()) {
+                                    case (int) PROFILE_IDENTIFIER:
+                                        Toast.makeText(MainActivity.this, mUsername, Toast.LENGTH_LONG).show();
+                                        return false;
+                                    case (int) HISTORY_IDENTIFIER:
+                                        Toast.makeText(MainActivity.this, "History", Toast.LENGTH_LONG).show();
+                                        return false;
+                                    case (int) SETTINGS_IDENTIFIER:
+                                        Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_LONG).show();
+                                        return false;
+                                    case (int) LOGOUT_IDENTIFIER:
+                                        mFirebaseAuth.signOut();
+                                        Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+                                        mFirebaseUser = null;
+                                        mUsername = ANONYMOUS;
+                                        mUserEmail = null;
+                                        mPhotoUrl = null;
+                                        startActivity(new Intent(MainActivity.this, SignInActivity.class));
+                                        return false;
+                                    default:
+                                        return false;
+                                }
+                            } else {
+                                return false;
+                            }
+                        }
+                    })
+                    .withSavedInstance(savedInstanceState)
+                    .withShowDrawerOnFirstLaunch(true)
+                    .build();
         }
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -100,11 +216,35 @@ public class MainActivity extends AppCompatActivity implements
         
     }
 
+    private void buildHeader(boolean compact, Bundle savedInstanceState) {
+        mDrawerHeader = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withCompactStyle(compact)
+                .withHeaderBackground(R.drawable.header)
+                .addProfiles(mProfile)
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean current) {
+                        return false;
+                    }
+                })
+                .withSavedInstance(savedInstanceState)
+                .build();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //add the values which need to be saved from the drawer to the bundle
+        outState = mDrawer.saveInstanceState(outState);
+        //add the values which need to be saved from the accountHeader to the bundle
+        outState = mDrawerHeader.saveInstanceState(outState);
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (mDrawer != null && mDrawer.isDrawerOpen()) {
+            mDrawer.closeDrawer();
         } else {
             super.onBackPressed();
         }
@@ -162,7 +302,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void closeDrawer() {
-
+        if (mDrawer != null && mDrawer.isDrawerOpen()) {
+            mDrawer.closeDrawer();
+        }
     }
 
     @Override

@@ -35,7 +35,6 @@
     <FrameLayout
         android:id="@+id/progressBarHolder"
         android:animateLayoutChanges="true"
-        android:visibility="gone"
         android:alpha="1"
         android:background="@color/black_overlay"
         android:layout_width="match_parent"

@@ -52,13 +52,18 @@ public class SignInActivity extends AppCompatActivity implements
     private FirebaseAuth mFirebaseAuth;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mProgressbarHolder = (FrameLayout) this.findViewById(R.id.progressBarHolder);
+        mProgressbar = (ProgressBar) findViewById(R.id.progressbar);
+        mProgressbarHolder.setVisibility(View.GONE);
+        mProgressbar.setVisibility(View.GONE);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-
-        mProgressbarHolder = (FrameLayout) findViewById(R.id.progressBarHolder);
-        mProgressbar = (ProgressBar) findViewById(R.id.progressbar);
-        mProgressbar.setVisibility(View.GONE);
 
         welcomeScreen = new WelcomeScreenHelper(this, CustomWelcomeActivity.class);
         welcomeScreen.show(savedInstanceState);
