@@ -10,7 +10,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -40,6 +42,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
@@ -55,11 +58,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
     public static final String ANONYMOUS = "anonymous";
-    private static final long PROFILE_IDENTIFIER = 0;
-    private static final long HOME_IDENTIFIER = 2;
-    private static final long HISTORY_IDENTIFIER = 2;
-    private static final long LOGOUT_IDENTIFIER = 9;
-    private static final long SETTINGS_IDENTIFIER = 10;
+    private static final int PROFILE_IDENTIFIER = 0;
+    private static final int HOME_IDENTIFIER = 1;
+    private static final int HISTORY_IDENTIFIER = 2;
+    private static final int LOGOUT_IDENTIFIER = 9;
+    private static final int SETTINGS_IDENTIFIER = 10;
 
     private AccountHeader mDrawerHeader = null;
     private Drawer mDrawer = null;
@@ -108,6 +111,11 @@ public class MainActivity extends AppCompatActivity implements
                 mPhotoUri = mFirebaseUser.getPhotoUrl();
             }
 
+            HomeFragment homeFragment = new HomeFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, homeFragment);
+            fragmentTransaction.commit();
+
             DrawerImageLoader.init(new AbstractDrawerImageLoader() {
                 @Override
                 public void set(ImageView imageView, Uri uri, Drawable placeholder) {
@@ -150,7 +158,11 @@ public class MainActivity extends AppCompatActivity implements
                                     .withIdentifier(HOME_IDENTIFIER),
                             new PrimaryDrawerItem().withName(R.string.order_history)
                                     .withIcon(FontAwesome.Icon.faw_history)
-                                    .withIdentifier(HISTORY_IDENTIFIER)
+                                    .withIdentifier(HISTORY_IDENTIFIER),
+                            new DividerDrawerItem(),
+                            new SecondaryDrawerItem().withName(R.string.settings)
+                                    .withIcon(FontAwesome.Icon.faw_cog)
+                                    .withIdentifier(SETTINGS_IDENTIFIER)
                     )
                     .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
                         @Override
@@ -175,9 +187,6 @@ public class MainActivity extends AppCompatActivity implements
                         }
                     })
                     .addStickyDrawerItems(
-                            new SecondaryDrawerItem().withName(R.string.settings)
-                                    .withIcon(FontAwesome.Icon.faw_cog)
-                                    .withIdentifier(SETTINGS_IDENTIFIER),
                             new SecondaryDrawerItem().withName(R.string.logout)
                                     .withIcon(FontAwesome.Icon.faw_sign_out)
                                     .withIdentifier(LOGOUT_IDENTIFIER)
@@ -188,16 +197,22 @@ public class MainActivity extends AppCompatActivity implements
                                                    IDrawerItem drawerItem) {
                             if (drawerItem != null) {
                                 switch ((int) drawerItem.getIdentifier()) {
-                                    case (int) PROFILE_IDENTIFIER:
+                                    case PROFILE_IDENTIFIER:
                                         Toast.makeText(MainActivity.this, mUsername, Toast.LENGTH_LONG).show();
                                         return false;
-                                    case (int) HISTORY_IDENTIFIER:
+                                    case HOME_IDENTIFIER:
+                                        HomeFragment homeFragment = new HomeFragment();
+                                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                                        fragmentTransaction.replace(R.id.fragment_container, homeFragment);
+                                        fragmentTransaction.commit();
+                                        return false;
+                                    case HISTORY_IDENTIFIER:
                                         Toast.makeText(MainActivity.this, R.string.order_history, Toast.LENGTH_LONG).show();
                                         return false;
-                                    case (int) SETTINGS_IDENTIFIER:
+                                    case SETTINGS_IDENTIFIER:
                                         Toast.makeText(MainActivity.this, R.string.settings, Toast.LENGTH_LONG).show();
                                         return false;
-                                    case (int) LOGOUT_IDENTIFIER:
+                                    case LOGOUT_IDENTIFIER:
                                         mFirebaseAuth.signOut();
                                         Auth.GoogleSignInApi.signOut(mGoogleApiClient);
                                         mFirebaseUser = null;
@@ -215,6 +230,8 @@ public class MainActivity extends AppCompatActivity implements
                     })
                     .withSavedInstance(savedInstanceState)
                     .withShowDrawerOnFirstLaunch(true)
+                    .withActionBarDrawerToggle(true)
+                    .withActionBarDrawerToggleAnimated(true)
                     .build();
         }
 
@@ -329,4 +346,5 @@ public class MainActivity extends AppCompatActivity implements
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
+
 }
