@@ -31,6 +31,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.stephentuso.welcome.WelcomeScreenHelper;
 
+import top.wefor.circularanim.CircularAnim;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -56,8 +58,8 @@ public class SignInActivity extends AppCompatActivity implements
         super.onStart();
         mProgressbarHolder = (FrameLayout) this.findViewById(R.id.progressBarHolder);
         mProgressbar = (ProgressBar) findViewById(R.id.progressbar);
-        mProgressbarHolder.setVisibility(View.GONE);
-        mProgressbar.setVisibility(View.GONE);
+//        mProgressbarHolder.setVisibility(View.GONE);
+//        mProgressbar.setVisibility(View.GONE);
     }
 
     @Override
@@ -78,13 +80,27 @@ public class SignInActivity extends AppCompatActivity implements
         });
 
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_btn);
-        mSignInButton.setSize(mSignInButton.SIZE_WIDE);
-        mSignInButton.setOnClickListener(this);
+        mSignInButton.setSize(SignInButton.SIZE_WIDE);
+        mSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CircularAnim.hide(mSignInButton)
+                        .endRadius(mProgressbar.getHeight() / 2)
+                        .onAnimationEndListener(new CircularAnim.OnAnimationEndListener() {
+                            @Override
+                            public void onAnimationEnd() {
+                                mProgressbar.setVisibility(View.VISIBLE);
+                                signIn();
+                            }
+                        }).go();
+            }
+        });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -97,7 +113,14 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        preTask();
+        CircularAnim.hide(mSignInButton)
+                .endRadius(mProgressbar.getHeight() / 2)
+                .onAnimationEndListener(new CircularAnim.OnAnimationEndListener() {
+                    @Override
+                    public void onAnimationEnd() {
+                        mProgressbar.setVisibility(View.VISIBLE);
+                    }
+                }).go();
 
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
@@ -105,7 +128,8 @@ public class SignInActivity extends AppCompatActivity implements
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else {
-                postTask();
+                mProgressbar.setVisibility(View.GONE);
+                CircularAnim.show(mSignInButton).go();
                 Log.e(TAG, "Google Sign In failed.");
             }
         }
@@ -152,18 +176,26 @@ public class SignInActivity extends AppCompatActivity implements
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-                        postTask();
+//                        postTask();
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
+                            mProgressbar.setVisibility(View.GONE);
+                            CircularAnim.show(mSignInButton).go();
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
-                            finish();
+                            CircularAnim.fullActivity(SignInActivity.this, mProgressbar)
+                                    .go(new CircularAnim.OnAnimationEndListener() {
+                                        @Override
+                                        public void onAnimationEnd() {
+                                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                                            finish();
+                                        }
+                                    });
                         }
                     }
                 });
@@ -172,22 +204,9 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        mProgressbar.setVisibility(View.GONE);
+        CircularAnim.show(mSignInButton).go();
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }
 
-    private void preTask() {
-        inAnimation = new AlphaAnimation(0f, 1f);
-        inAnimation.setDuration(0);
-        mProgressbarHolder.setAnimation(inAnimation);
-        mProgressbarHolder.setVisibility(View.VISIBLE);
-        mProgressbar.setVisibility(View.VISIBLE);
-    }
-
-    private void postTask() {
-        outAnimation = new AlphaAnimation(1f, 0f);
-        outAnimation.setDuration(200);
-        mProgressbarHolder.setAnimation(outAnimation);
-        mProgressbarHolder.setVisibility(View.GONE);
-        mProgressbar.setVisibility(View.GONE);
-    }
 }

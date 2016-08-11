@@ -53,8 +53,8 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerUIUtils;
 
 public class MainActivity extends AppCompatActivity implements
-        NavigationView.OnNavigationItemSelectedListener,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        HomeFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
     public static final String ANONYMOUS = "anonymous";
@@ -307,44 +307,13 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-
-        switch (item.getItemId()) {
-            case R.id.nav_account:
-                closeDrawer();
-                return true;
-            case R.id.nav_history:
-                closeDrawer();
-                return true;
-            case R.id.nav_settings:
-                closeDrawer();
-                return true;
-            case R.id.nav_signout:
-                mFirebaseAuth.signOut();
-                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-                mFirebaseUser = null;
-                mFirebaseUser = null;
-                mUsername = ANONYMOUS;
-                mPhotoUri = null;
-                startActivity(new Intent(this, SignInActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void closeDrawer() {
-        if (mDrawer != null && mDrawer.isDrawerOpen()) {
-            mDrawer.closeDrawer();
-        }
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }
