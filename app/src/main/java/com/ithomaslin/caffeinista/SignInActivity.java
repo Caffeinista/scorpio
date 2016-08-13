@@ -58,8 +58,6 @@ public class SignInActivity extends AppCompatActivity implements
         super.onStart();
         mProgressbarHolder = (FrameLayout) this.findViewById(R.id.progressBarHolder);
         mProgressbar = (ProgressBar) findViewById(R.id.progressbar);
-//        mProgressbarHolder.setVisibility(View.GONE);
-//        mProgressbar.setVisibility(View.GONE);
     }
 
     @Override
@@ -113,14 +111,6 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        CircularAnim.hide(mSignInButton)
-                .endRadius(mProgressbar.getHeight() / 2)
-                .onAnimationEndListener(new CircularAnim.OnAnimationEndListener() {
-                    @Override
-                    public void onAnimationEnd() {
-                        mProgressbar.setVisibility(View.VISIBLE);
-                    }
-                }).go();
 
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
@@ -176,7 +166,6 @@ public class SignInActivity extends AppCompatActivity implements
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-//                        postTask();
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
