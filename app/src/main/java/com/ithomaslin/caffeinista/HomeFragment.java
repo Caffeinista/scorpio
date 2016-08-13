@@ -14,6 +14,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.firebase.client.Firebase;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
@@ -34,7 +42,9 @@ public class HomeFragment extends Fragment implements
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private OnFragmentInteractionListener mListener;
-    private CardAdapter mCardAdapter;
+    private DatabaseReference mFirebaseDatabaseReference;
+    private LinearLayoutManager mLinearLayoutManager;
+    private FirebaseRecyclerAdapter<Barista, BaristaViewHolder> mFirebaseAdapter;
 
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
@@ -69,17 +79,47 @@ public class HomeFragment extends Fragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        String[] dataset = new String[100];
-        for (int i=0; i<dataset.length; ++i) {
-            dataset[i] = "item" + i;
-        }
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<Barista, BaristaViewHolder>(
+                Barista.class,
+                R.layout.card_item,
+                BaristaViewHolder.class,
+                mFirebaseDatabaseReference.child("users")) {
+            @Override
+            protected void populateViewHolder(BaristaViewHolder viewHolder, Barista model, int position) {
+                viewHolder.mTextView.setText(model.getName());
+            }
 
-        mCardAdapter = new CardAdapter(dataset, getActivity());
-        mRecyclerView.setAdapter(mCardAdapter);
+            @Override
+            public int getItemCount() {
+                return super.getItemCount();
+            }
+
+            @Override
+            public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+                super.onAttachedToRecyclerView(recyclerView);
+            }
+        };
+
+        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int baristaCount = mFirebaseAdapter.getItemCount();
+                int firstVisiblePosition = mLinearLayoutManager.findFirstVisibleItemPosition();
+
+                if (firstVisiblePosition == 1 ||
+                        (positionStart >= baristaCount && firstVisiblePosition == positionStart)) {
+                    mRecyclerView.scrollToPosition(positionStart);
+                }
+            }
+        });
+
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setAdapter(mFirebaseAdapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -91,12 +131,11 @@ public class HomeFragment extends Fragment implements
 
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+//    public void onButtonPressed(Uri uri) {
+//        if (mListener != null) {
+//            mListener.onFragmentInteraction(uri);
+//        }
+//    }
 
     @Override
     public void onAttach(Context context) {
@@ -142,10 +181,23 @@ public class HomeFragment extends Fragment implements
 
     void onRefreshComplete() {
         Log.i(TAG, "onRefreshComplete");
-
-
         // Stop refresh animation
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    public static class BaristaViewHolder extends RecyclerView.ViewHolder {
+        private TextView mTextView;
+
+        public BaristaViewHolder(final View v) {
+            super(v);
+            mTextView = (TextView) v.findViewById(R.id.name);
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(v.getContext(), mTextView.getText().toString(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     private class BackgroundTask extends AsyncTask<Void, Void, List<String>> {
