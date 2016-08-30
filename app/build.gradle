@@ -31,7 +31,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:9.2.1'
 
     // Firebase
-    compile 'com.firebase:firebase-client-android:2.5.1'
     compile 'com.google.firebase:firebase-core:9.2.1'
     compile 'com.google.firebase:firebase-database:9.2.1'
     compile 'com.google.firebase:firebase-auth:9.2.1'
@@ -74,6 +73,10 @@ dependencies {
     compile 'com.mikepenz:fontawesome-typeface:4.6.0.3@aar'
     compile 'com.github.XunMengWinter:CircularAnim:0.3.1'
     compile 'com.sdsmdg.tastytoast:tastytoast:0.0.3'
+    compile 'com.webianks.library:popup-bubble:1.0.2'
+    compile 'com.github.jaouan:revealator:1.1.0'
+    compile 'com.mikhaellopez:circularimageview:3.0.2'
+    compile 'com.github.ksoichiro:android-observablescrollview:1.6.0'
 
     // WelcomeScreen
     compile project(path: ":library")
